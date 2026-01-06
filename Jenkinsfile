@@ -6,7 +6,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/your-repo/project.git'
+                    url: 'https://github.com/DURGAPRASAD-67/Jenkin-CICD.git'
             }
         }
 
@@ -19,7 +19,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                  docker build -t maven-web-app:${BUILD_NUMBER} .
+                  docker build -t organic .
                 '''
             }
         }
@@ -33,7 +33,7 @@ pipeline {
                   docker run -d \
                     --name webapp \
                     -p 8081:8080 \
-                    maven-web-app:${BUILD_NUMBER}
+                    organic
                 '''
             }
         }
