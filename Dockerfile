@@ -1,4 +1,4 @@
-FROM tomcat:9.0.113-jdk17-temurin
+FROM tomcat:9.0.113
 
 LABEL maintainer="Durga <durgaprasadsetti67@gmail.com>"
 
