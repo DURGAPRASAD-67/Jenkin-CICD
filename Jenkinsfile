@@ -19,7 +19,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                docker rmi -f ogranic || true
                   docker build -t organic .
                 '''
             }
