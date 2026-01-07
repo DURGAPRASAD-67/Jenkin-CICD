@@ -1,16 +1,19 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "prasad67/maven-web-app"
+    }
+
     stages {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/DURGAPRASAD-67/Jenkin-CICD.git'
+                checkout scm
             }
         }
 
-        stage('Build with Maven') {
+        stage('Build WAR') {
             steps {
                 sh 'mvn clean package'
             }
@@ -19,21 +22,29 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                  docker build -t organic .
+                  docker build -t $IMAGE_NAME:${BUILD_NUMBER} .
                 '''
             }
         }
 
-        stage('Deploy Docker Container') {
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                      echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push Image to Docker Hub') {
             steps {
                 sh '''
-                  docker stop webapp || true
-                  docker rm webapp || true
-
-                  docker run -d \
-                    --name webapp \
-                    -p 8081:8080 \
-                    organic
+                  docker push $IMAGE_NAME:${BUILD_NUMBER}
                 '''
             }
         }
