@@ -1,52 +1,25 @@
 pipeline {
     agent any
-
-    environment {
-        IMAGE_NAME = "prasad67/maven-web-app"
-    }
-
+ 
     stages {
-
-        stage('Checkout Code') {
+        stage('Clone') {
             steps {
-                checkout scm
+                git 'https://github.com/DURGAPRASAD-67/Jenkin-CICD.git'
             }
         }
-
-        stage('Build WAR') {
+        stage('mvn Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
-
-        stage('Build Docker Image') {
+        stage('Docker Image') {
             steps {
-                sh '''
-                  docker build -t $IMAGE_NAME:${BUILD_NUMBER} .
-                '''
+                sh 'docker build -t amazon .'
             }
         }
-
-        stage('Login to Docker Hub') {
+        stage('Docker Deploy') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh '''
-                      echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    '''
-                }
-            }
-        }
-
-        stage('Push Image to Docker Hub') {
-            steps {
-                sh '''
-                  docker push $IMAGE_NAME:${BUILD_NUMBER}
-                '''
+                sh 'docker run -d -p 6060:8080 --name azure amazon'
             }
         }
     }
-}
