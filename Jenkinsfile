@@ -5,7 +5,7 @@ pipeline {
 
         stage('Clone') {
             steps {
-                git 'https://github.com/DURGAPRASAD-67/Jenkin-CICD.git'
+                git ''
             }
         }
 
@@ -15,7 +15,24 @@ pipeline {
             }
         }
 
-        stage('Docker Image') {
+        stage('Stop & Remove Old Container') {
+            steps {
+                sh '''
+                docker stop azure || true
+                docker rm azure || true
+                '''
+            }
+        }
+
+        stage('Remove Old Image') {
+            steps {
+                sh '''
+                docker rmi amazon || true
+                '''
+            }
+        }
+
+        stage('Docker Image Build') {
             steps {
                 sh 'docker build -t amazon .'
             }
@@ -26,6 +43,5 @@ pipeline {
                 sh 'docker run -d -p 6060:8080 --name azure amazon'
             }
         }
-
     }
 }
